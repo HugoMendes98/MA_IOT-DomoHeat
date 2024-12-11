@@ -1,0 +1,7 @@
+// copy to `config.h`
+
+const char WIFI_SSID[] = "";
+const char WIFI_PASS[] = "";
+
+const char MQTT_HOST[] = "";
+const int MQTT_PORT = 1883;

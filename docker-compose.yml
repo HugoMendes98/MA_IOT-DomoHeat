@@ -1,0 +1,16 @@
+services:
+  # The "local" broker - for the esp32 and rasp (eg.inside a house)
+  broker_local:
+    image: eclipse-mosquitto:2.0.18
+    ports:
+      - "0.0.0.0:1883:1883"
+    volumes:
+    - "./broker/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro"
+
+  # The "cloud" broker - rasp to "cloud" (another rasp)
+  broker_cloud:
+    image: eclipse-mosquitto:2.0.18
+    ports:
+      - "0.0.0.0:1884:1883"
+    volumes:
+      - "./broker/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro"

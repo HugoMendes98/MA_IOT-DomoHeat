@@ -1,0 +1,1 @@
+https://learn.adafruit.com/adafruit-esp32-feather-v2/arduino-ide-setup
