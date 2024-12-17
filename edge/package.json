@@ -2,7 +2,7 @@
   "name": "edge",
   "version": "1.0.0",
   "scripts": {
-    "start:dev": "nodemon --exec node --no-warnings=ExperimentalWarning --loader ts-node/esm ./src/main.ts"
+    "start:dev": "nodemon ./src/main.ts"
   },
   "author": "",
   "license": "ISC",

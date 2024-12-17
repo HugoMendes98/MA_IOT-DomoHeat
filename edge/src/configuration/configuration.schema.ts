@@ -15,6 +15,8 @@ export const configurationSchema = z
 		cloud: configurationMqttSchema,
 		/** Local with sensors and "children" edges (unused with cloud mode) */
 		local: configurationMqttSchema,
+		/** storage directory */
+		storage: z.string(),
 	})
 	.strip();
 export type Configuration = z.infer<typeof configurationSchema>;

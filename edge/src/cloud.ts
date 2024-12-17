@@ -1,7 +1,9 @@
 import { MqttClient } from "mqtt";
+
 import { publicSyncAck, registerToSync } from "./mqtt/index.js";
 import { Logger } from "./logger.js";
 import { SyncEdgePayload } from "./payloads/sync.js";
+import { STORED_DATA } from "./data.js";
 
 export interface RunCloudParams {
 	/** Connected to the "cloud" broker with "children" edges */
@@ -14,9 +16,7 @@ export function runCloud(DEVICE_ID: string, params: RunCloudParams) {
 	client.on("connect", () => logger.log("MQTT connected"));
 
 	function handleSyncEdge(payload: SyncEdgePayload) {
-		// TODO: Store data
-		console.log(payload);
-
+		STORED_DATA.append(payload);
 		publicSyncAck(client, DEVICE_ID, payload);
 	}
 

@@ -21,13 +21,14 @@ export const syncSensorEdgePayloadSchema = sensorIdentifierSchema.extend({
 });
 export type SyncEdgeSensorPayload = z.infer<typeof syncSensorEdgePayloadSchema>;
 
+export type SyncNodes = Record<string, SyncEdgePayload>;
 /** Full sync payload content */
 export type SyncEdgePayload =
 	| SyncEdgeSensorPayload
 	| (EdgeIdentifier & {
 			/** Date if sync */
 			date: Date;
-			nodes: Record<string, SyncEdgePayload>;
+			nodes: SyncNodes;
 	  });
 export const syncEdgePayloadSchema: z.ZodType<SyncEdgePayload> =
 	z.discriminatedUnion("type", [
@@ -39,3 +40,5 @@ export const syncEdgePayloadSchema: z.ZodType<SyncEdgePayload> =
 			nodes: z.record(z.lazy(() => syncEdgePayloadSchema)),
 		}),
 	]);
+
+export type SyncEdgeEdgePayload = Extract<SyncEdgePayload, { type: "edge" }>;
