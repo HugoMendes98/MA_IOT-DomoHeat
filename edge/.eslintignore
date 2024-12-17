@@ -1,0 +1,13 @@
+dist/
+node_modules/
+package-lock.json
+
+# Do not ignore the rule configuration files
+!.*rc.json
+
+!.vscode/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/settings.json
+!.vscode/tasks.json

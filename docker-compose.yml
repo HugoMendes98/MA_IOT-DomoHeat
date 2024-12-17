@@ -7,11 +7,19 @@ services:
     volumes:
     - "./broker/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro"
 
-  # The "cloud" broker - rasp to "cloud" (another rasp)
+  # The "cloud" broker - rasp to "another" (another rasp)
   broker_cloud:
     image: eclipse-mosquitto:2.0.18
     ports:
       - "0.0.0.0:1884:1883"
+    volumes:
+      - "./broker/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro"
+  
+  # Same the previous, if we want to "cascade them"
+  broker_cloud2:
+    image: eclipse-mosquitto:2.0.18
+    ports:
+      - "0.0.0.0:1885:1883"
     volumes:
       - "./broker/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro"
   

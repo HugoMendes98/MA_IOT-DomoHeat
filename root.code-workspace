@@ -1,0 +1,19 @@
+{
+	"folders": [
+		{
+			"name": "root",
+			"path": "."
+		},
+		{
+			"path": "edge"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"root.code-workspace": "json"
+		},
+		"files.exclude": {
+			"edge": true
+		}
+	}
+}

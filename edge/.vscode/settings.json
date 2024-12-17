@@ -1,0 +1,31 @@
+{
+	"auto-close-tag.activationOnLanguage": [
+		"HTML (EEx)",
+		"HTML (Eex)",
+		"ejs",
+		"markdown",
+		"xml"
+	],
+	"editor.codeActionsOnSave": {
+		"source.fixAll": "explicit"
+	},
+	"eslint.onIgnoredFiles": "warn",
+	"eslint.validate": [
+		"html",
+		"javascript",
+		"javascriptreact",
+		"json",
+		"markdown",
+		"typescript",
+		"typescriptreact",
+		"vue",
+		"yaml"
+	],
+	"files.associations": {
+		// Supposition: some files are ignored (e.g.: tsconfig.json) in the eslint plugin
+		// Doing this, "force" them to be considered
+		"*.json": "json",
+		"*.yaml": "yaml",
+		"*.yml": "yaml"
+	}
+}

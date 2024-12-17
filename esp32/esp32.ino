@@ -32,13 +32,13 @@ void messageReceived(String &topic, String &payload) {
     return;
   }
   
-  if (!doc["temp"].is<double>()) {
-    Serial.println("'temp' not found in JSON");
+  if (!doc["temperature"].is<double>()) {
+    Serial.println("'temperature' not found in JSON");
     return;
   }
 
-  double temp = doc["temp"];
-  Serial.print("Received 'temp' of: ");
+  double temp = doc["temperature"];
+  Serial.print("Received 'temperature' of: ");
   Serial.println(temp);
 
   digitalWrite(PIN_LED_10, LOW);
@@ -147,10 +147,13 @@ void loop() {
   lastMillis = millis();
 
   JsonDocument doc;
+  // Not data
   doc["type"] = "sensor";
+  doc["id"] = DEVICE_ID;
+
   doc["humidity"] = bme.getHumidity();
   doc["pressure"] = bme.getPressure();
-  doc["temp"] = bme.getTemperature();
+  doc["temperature"] = bme.getTemperature();
 
   String output;
   serializeJson(doc, output);
