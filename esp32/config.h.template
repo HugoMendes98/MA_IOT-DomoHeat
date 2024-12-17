@@ -4,4 +4,7 @@ const char WIFI_SSID[] = "";
 const char WIFI_PASS[] = "";
 
 const char MQTT_HOST[] = "";
-const int MQTT_PORT = 1883;
+const uint MQTT_PORT = 1883;
+
+// Time in milliseconds
+const uint SYNC_TIME = 5000;

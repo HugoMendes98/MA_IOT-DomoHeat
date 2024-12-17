@@ -19,6 +19,9 @@ Bme280TwoWire bme;
 WiFiClient net; // This must be global-scoped
 MQTTClient mqttClient(4096); // 4kB should be enough
 
+// Set in `setup`
+String DEVICE_ID = "";
+
 void messageReceived(String &topic, String &payload) {
   Serial.println("incoming: " + topic + " - " + payload);
 
@@ -70,6 +73,10 @@ void setup() {
   Serial.begin(115200);
   while(!Serial) {}
 
+  char uid[32];
+  sprintf(uid, "esp-%012llx", ESP.getEfuseMac());
+  DEVICE_ID+= String(uid);
+
   pinMode(PIN_LED_10, OUTPUT);
   pinMode(PIN_LED_20, OUTPUT);
   pinMode(PIN_LED_30, OUTPUT);
@@ -119,41 +126,34 @@ void setup() {
   mqttClient.onMessage(messageReceived);
 
   Serial.print("\nMQTT connecting...");
-  while (!mqttClient.connect("esp32")) {
+  while (!mqttClient.connect(DEVICE_ID.c_str())) {
     Serial.print(".");
     delay(1000);
   }
   Serial.println("");
   Serial.println("MQTT connected!");
 
-  mqttClient.subscribe("/set");
+  mqttClient.subscribe("/sensor/" + DEVICE_ID + "/set");
 }
 
 unsigned long lastMillis = 0;
 void loop() {
   mqttClient.loop();
 
-  if (millis() - lastMillis < 1000) {
+  if (millis() - lastMillis < SYNC_TIME) {
     return;
   }
+
   lastMillis = millis();
 
-  Serial.print("Temperature = ");
-  Serial.print(bme.getTemperature());
-  Serial.println(" *C");
-
-  Serial.print("Pressure = ");
-  Serial.print(bme.getPressure());
-  Serial.println(" hPa");
-
-  Serial.print("Humidity = ");
-  Serial.print(bme.getHumidity());
-  Serial.println(" %");
-
   JsonDocument doc;
+  doc["type"] = "sensor";
+  doc["humidity"] = bme.getHumidity();
+  doc["pressure"] = bme.getPressure();
   doc["temp"] = bme.getTemperature();
+
   String output;
   serializeJson(doc, output);
 
-  mqttClient.publish("/sync", output);
+  mqttClient.publish("/sensor/" + DEVICE_ID + "/sync", output);
 }

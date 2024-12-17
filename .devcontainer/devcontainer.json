@@ -1,0 +1,40 @@
+{
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"EditorConfig.EditorConfig",
+				"GitHub.vscode-pull-request-github",
+				"Gruntfuggly.todo-tree",
+				"ambooth.git-rename",
+				"bierner.markdown-mermaid",
+				"dbaeumer.vscode-eslint",
+				"firsttris.vscode-jest-runner",
+				"github.vscode-github-actions",
+				"hediet.vscode-drawio",
+				"mhutchie.git-graph",
+				"ms-azuretools.vscode-docker",
+				"redhat.vscode-yaml",
+				"streetsidesoftware.code-spell-checker",
+				"vivaxy.vscode-conventional-commits",
+				"waderyan.gitblame",
+				"yoavbls.pretty-ts-errors"
+			],
+			"settings": {
+				// Ensure correct node version
+				"eslint.runtime": "/usr/local/bin/node"
+			}
+		}
+	},
+	"dockerComposeFile": ["../docker-compose.yml", "./docker-compose.yml"],
+	"features": {
+		"ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
+	},
+	"name": "DevContainer",
+	"remoteEnv": {
+		"MQTT_CLOUD_HOST": "broker_cloud",
+		"MQTT_LOCAL_HOST": "broker_local"
+	},
+	"service": "devcontainer",
+	"shutdownAction": "stopCompose",
+	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}"
+}

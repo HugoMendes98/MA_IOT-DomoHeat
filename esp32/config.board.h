@@ -4,7 +4,7 @@
 // The number means when the temperature is set to > X (ex: > 10)
 const int PIN_LED_10 = 14;
 const int PIN_LED_20 = 32;
-const int PIN_LED_30 = 15;
+const int PIN_LED_30 = 33; // Pin 15 endommaged in board 2
 
 // Pins for the BME module
 const int PIN_BME_GND = 19;  // will "work" as GND
