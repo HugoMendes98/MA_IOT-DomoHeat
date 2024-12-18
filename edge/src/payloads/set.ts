@@ -4,7 +4,7 @@ import {
 	EdgeIdentifier,
 	edgeIdentifierSchema,
 	sensorIdentifierSchema,
-} from "./common.ts";
+} from "./common.js";
 
 /** Data send directly to a sensor to control it */
 export const setSensorPayloadSchema = dataSchema

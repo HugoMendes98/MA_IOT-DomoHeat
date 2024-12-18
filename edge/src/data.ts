@@ -19,9 +19,17 @@ export const STORED_DATA = {
 			fs.readFileSync(pathData).toString(),
 		) as SyncEdgeEdgePayload;
 	},
+	/**
+	 * Add new data
+	 * @param sync to add/update
+	 * @returns the updated data
+	 */
 	append: (sync: SyncEdgePayload) => {
 		const loaded = STORED_DATA.read();
-		STORED_DATA.write(updateRootSync(loaded, sync));
+		const updated = updateRootSync(loaded, sync);
+
+		STORED_DATA.write(updated);
+		return updated;
 	},
 	empty: () => {
 		STORED_DATA.write({

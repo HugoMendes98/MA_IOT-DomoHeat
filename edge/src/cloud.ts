@@ -1,8 +1,8 @@
 import { MqttClient } from "mqtt";
 
 import { publicSyncAck, registerToSync } from "./mqtt/index.js";
-import { Logger } from "./logger.js";
-import { SyncEdgePayload } from "./payloads/sync.js";
+import { formatCommand, formatIdentifier, Logger } from "./logger.js";
+import { extractDateFromSync, SyncEdgePayload } from "./payloads/sync.js";
 import { STORED_DATA } from "./data.js";
 
 export interface RunCloudParams {
@@ -16,8 +16,13 @@ export function runCloud(DEVICE_ID: string, params: RunCloudParams) {
 	client.on("connect", () => logger.log("MQTT connected"));
 
 	function handleSyncEdge(payload: SyncEdgePayload) {
+		const date = extractDateFromSync(payload);
+		logger.log(
+			`Received ${formatCommand("sync")} from ${formatIdentifier(payload)} [sync-date: ${date.toISOString()}]`,
+		);
+
 		STORED_DATA.append(payload);
-		publicSyncAck(client, DEVICE_ID, payload);
+		publicSyncAck(client, { id: DEVICE_ID, type: "edge" }, payload, logger);
 	}
 
 	registerToSync(client, {

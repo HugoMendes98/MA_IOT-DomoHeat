@@ -7,6 +7,8 @@ import {
 	SyncSensorPayload,
 	syncSensorPayloadSchema,
 } from "../payloads/index.js";
+import { EdgeIdentifier } from "../payloads/common.js";
+import { formatCommand, Logger } from "../logger.js";
 
 /** Handlers for {@link registerToSync} */
 export interface SyncHandlers {
@@ -69,16 +71,20 @@ export function registerToSync(client: MqttClient, handlers: SyncHandlers) {
  */
 export function publicSyncAck(
 	client: MqttClient,
-	id: string,
+	identifier: EdgeIdentifier,
 	payload: SyncEdgePayload,
+	logger: Logger,
 ) {
 	if (payload.type === "sensor") {
 		// No ack for sensors
 		return;
 	}
 
+	logger.log(
+		`publish ${formatCommand("sync-ack")} [sync-date: ${payload.date.toISOString()}]`,
+	);
 	client.publish(
 		`/edge/${payload.id}/sync_ack`,
-		toMqttPayload<SyncAckPayload>({ date: payload.date, id }),
+		toMqttPayload<SyncAckPayload>({ ...identifier, date: payload.date }),
 	);
 }

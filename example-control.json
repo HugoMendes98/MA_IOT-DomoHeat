@@ -1,0 +1,24 @@
+{
+    "id": "edge2",
+    "type": "edge",
+
+    "nodes": {
+        "edge": {
+            "id": "edge1",
+            "type": "edge",
+    
+            "nodes": {
+                "esp-485d05b267ac": {
+                    "id": "esp-485d05b267ac",
+                    "type": "sensor",
+                    "temperature": 37
+                }
+            }
+        },
+        "esp-2caacdab6224": {
+            "id": "esp-2caacdab6224",
+            "type": "sensor",
+            "temperature": 37
+        }
+    }
+}

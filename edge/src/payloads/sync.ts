@@ -4,7 +4,7 @@ import {
 	EdgeIdentifier,
 	edgeIdentifierSchema,
 	sensorIdentifierSchema,
-} from "./common.ts";
+} from "./common.js";
 
 /** The data schema with the date (set by a edge) */
 const dataDatedSchema = dataSchema.extend({ date: z.coerce.date() });
@@ -42,3 +42,12 @@ export const syncEdgePayloadSchema: z.ZodType<SyncEdgePayload> =
 	]);
 
 export type SyncEdgeEdgePayload = Extract<SyncEdgePayload, { type: "edge" }>;
+
+export function extractDateFromSync(sync: SyncEdgePayload): Date {
+	switch (sync.type) {
+		case "edge":
+			return sync.date;
+		case "sensor":
+			return sync.data[0].date;
+	}
+}

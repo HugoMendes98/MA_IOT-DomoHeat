@@ -1,15 +1,14 @@
 import { MqttClient } from "mqtt";
-import {
-	SetEdgePayload,
-	SetSensorPayload,
-	SyncEdgePayload,
-} from "./payloads/index.js";
+import { extractDateFromSync, SyncEdgePayload } from "./payloads/index.js";
 import {
 	publicSyncAck,
 	registerEdgeListeners,
 	registerToSync,
+	toMqttPayload,
 } from "./mqtt/index.js";
-import { Logger } from "./logger.js";
+import { Logger, formatCommand, formatIdentifier } from "./logger.js";
+import { STORED_DATA } from "./data.js";
+import { handleSetPayload } from "./set-payload.handler.js";
 
 export interface RunEdgeParams {
 	/** Connected to the "local" broker with sensors and "children" edges */
@@ -22,83 +21,49 @@ export function runEdge(DEVICE_ID: string, params: RunEdgeParams) {
 	const logger = new Logger(DEVICE_ID);
 
 	clientLocal.on("connect", () => logger.log("MQTT local connected"));
-	clientLocal.on("connect", () => logger.log("MQTT cloud connected"));
+	clientCloud.on("connect", () => logger.log("MQTT cloud connected"));
 
+	function handleSync(payload: SyncEdgePayload) {
+		const date = extractDateFromSync(payload);
+		logger.log(
+			`Received ${formatCommand("sync")} from ${formatIdentifier(payload)} [sync-date: ${date.toISOString()}]`,
+		);
+
+		const stored = STORED_DATA.append(payload);
+		publicSyncAck(
+			clientLocal,
+			{ id: DEVICE_ID, type: "edge" },
+			payload,
+			logger,
+		);
+
+		// Forward data
+		// TODO: that would probably be better if the data is published in a second time
+		logger.log(
+			`publish ${formatCommand("sync")} [sync-date: ${stored.date.toISOString()}]`,
+		);
+		clientCloud.publish(`/edge/${DEVICE_ID}/sync`, toMqttPayload(stored));
+	}
 	registerToSync(clientLocal, {
-		handleEdgeSync(topic, payload) {
-			// TODO: store and send in a 2nd time
-
-			clientCloud.publish(
-				`/edge/${DEVICE_ID}/sync`,
-				JSON.stringify({
-					id: DEVICE_ID,
-					type: "edge",
-					date: new Date(),
-
-					nodes: { [payload.id]: payload },
-				} satisfies SyncEdgePayload),
-			);
-
-			publicSyncAck(clientLocal, DEVICE_ID, payload);
-		},
-		handleSensorSync(topic, payload) {
-			// TODO: store and send in a 2nd time
-			clientCloud.publish(
-				`/edge/${DEVICE_ID}/sync`,
-				JSON.stringify({
-					id: DEVICE_ID,
-					type: "edge",
-					date: new Date(),
-
-					nodes: {
-						[payload.id]: {
-							id: payload.id,
-							type: "sensor",
-
-							data: [{ ...payload, date: new Date() }],
-						},
-					},
-				} satisfies SyncEdgePayload),
-			);
-		},
+		handleEdgeSync: (_, payload) => handleSync(payload),
+		handleSensorSync: (_, payload) =>
+			handleSync({
+				id: payload.id,
+				type: "sensor",
+				data: [{ ...payload, date: new Date() }],
+			}),
 	});
 
-	function handleSets(setPayload: SetEdgePayload) {
-		if (setPayload.type === "sensor") {
-			if (setPayload.temperature === undefined) {
-				return;
-			}
-
-			clientLocal.publish(
-				`/sensor/${setPayload.id}/set`,
-				JSON.stringify({
-					temperature: setPayload.temperature,
-				} satisfies SetSensorPayload),
-			);
-
-			return;
-		}
-
-		for (const [_, setData] of Object.entries(setPayload.nodes)) {
-			if (setData.type === "sensor") {
-				// Direct sensor of this edge
-				handleSets(setData);
-				continue;
-			}
-
-			// Forward to their own edge
-			clientLocal.publish(
-				`/edge/${setData.id}/set`,
-				JSON.stringify(setData satisfies SetEdgePayload),
-			);
-		}
-	}
 	registerEdgeListeners(DEVICE_ID, clientCloud, {
-		handleSet(topic, payload) {
-			handleSets(payload);
-		},
-		handleSyncAck(topic, payload) {
-			console.log("Received an ack", payload);
+		handleSet: (_, payload) =>
+			handleSetPayload(clientLocal, payload, logger),
+		handleSyncAck(_, payload) {
+			logger.log(
+				`Received ${formatCommand("sync-ack")} from ${formatIdentifier(payload)} [sync-date: ${payload.date.toISOString()}]`,
+			);
+
+			// TODO: should check the date before cleaning
+			STORED_DATA.empty();
 		},
 	});
 }
